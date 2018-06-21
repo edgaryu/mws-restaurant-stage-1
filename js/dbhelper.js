@@ -149,8 +149,8 @@ class DBHelper {
   /**
    * Restaurant image URL.
    */
-  static imageUrlForRestaurant(restaurant) {
-  		const img = document.createElement('img');
+  static imageUrlForRestaurant(restaurant, img) {
+  		// const img = document.createElement('img');
   		img.className = 'restaurant-img';
   		var srcBaseName = `${restaurant.photograph}`;
   		if (srcBaseName.endsWith('.jpg')) {
@@ -160,11 +160,11 @@ class DBHelper {
   		const largeImgUrl = (`/images/${srcBaseName}-800w.jpg`);
 
   		img.src = largeImgUrl;
-  		img.alt = `${restaurant.name}`;
+  		img.alt = `Image of ${restaurant.name}`;
   		img.sizes = '(max-width: 450px) 50vw, 50vw';
   		img.srcset = (`${smallImgUrl} 400w, ${largeImgUrl} 800w`);
 
-    return img;
+    // return img;
   }
 
   /**

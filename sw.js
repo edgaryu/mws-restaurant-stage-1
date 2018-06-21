@@ -1,3 +1,6 @@
+// Code adapted from MDN article 'Using Service Workers' 
+// https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers
+
 self.addEventListener('install', function(event) {
 	var urls = [
 		'/',
@@ -54,8 +57,3 @@ self.addEventListener('fetch', function(event) {
     })
   );
 });
-
-// self.addEventListener('fetch', function(event) {
-
-// 	console.log(event.request);
-// });

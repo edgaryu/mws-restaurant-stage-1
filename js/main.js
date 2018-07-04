@@ -162,7 +162,7 @@ createRestaurantHTML = (restaurant) => {
   DBHelper.imageUrlForRestaurant(restaurant, image);
   // image.className = 'restaurant-img';
   // image.src = DBHelper.imageUrlForRestaurant(restaurant);
-  li.append(image);
+  	li.append(image);
 
   const name = document.createElement('h1');
   name.innerHTML = restaurant.name;

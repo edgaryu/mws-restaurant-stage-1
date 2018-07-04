@@ -1,6 +1,28 @@
 /**
  * Common database helper functions.
  */
+// var db;
+// var request = indexedDB.open("restaurants");
+// request.onerror = function(evt) {
+//   console.log("Database error code: " + evt.target.errorCode);
+// };
+// request.onsuccess = function(evt) {
+//   db = request.result;
+
+// };
+
+// const dbPromise = idb.open('keyval-store', 1, upgradeDB => {
+//   upgradeDB.createObjectStore('keyval');
+// });
+
+// dbPromise.then(function(db) {
+// 	var tx = db.transaction('keyval');
+// 	var keyValStore = tx.objectStore('keyval');
+// 	return keyValStore.get('hello');
+// }).then(function(val) {
+// 	console.log('The value of "hello" is:', val);
+// });
+
 class DBHelper {
 
   /**

@@ -1,5 +1,6 @@
-// Code adapted from MDN article 'Using Service Workers' 
+// Code adapted from MDN article 'Using Service Workers', and Google article 'Service Workers: an Introduction' 
 // https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers
+// https://developers.google.com/web/fundamentals/primers/service-workers/
 
 
 self.addEventListener('install', function(event) {

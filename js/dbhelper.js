@@ -14,7 +14,6 @@
 // const dbPromise = idb.open('keyval-store', 1, upgradeDB => {
 //   upgradeDB.createObjectStore('keyval');
 // });
-
 // dbPromise.then(function(db) {
 // 	var tx = db.transaction('keyval');
 // 	var keyValStore = tx.objectStore('keyval');
@@ -22,6 +21,7 @@
 // }).then(function(val) {
 // 	console.log('The value of "hello" is:', val);
 // });
+
 
 class DBHelper {
 
@@ -37,63 +37,91 @@ class DBHelper {
     return `http://localhost:${port}/restaurants`;
   }
 
+  static handleErrors(response) {
+		if (!response.ok) {
+			console.log("Error");
+			throw Error(response.statusText);
+		}
+		return response;
+	}
+
   /**
    * Fetch all restaurants.
    */
   static fetchRestaurants(callback) {
-    // let xhr = new XMLHttpRequest();
-    // xhr.open('GET', DBHelper.DATABASE_URL);
-    // xhr.onload = () => {
+		fetch(DBHelper.DATABASE_URL)
+		.then(function(response)  {
+			var restaurants = response.clone();
 
-    //   if (xhr.status === 200) { // Got a success response from server!
-    //     const restaurants = JSON.parse(xhr.responseText);
-    //     callback(null, restaurants);
-    //   } else { // Oops!. Got an error from server.
-    //     const error = (`Request failed. Returned status of ${xhr.status}`);
-    //     callback(error, null);
-    //   }
-    // };
-    // xhr.send();
+			var dbPromise = idb.open('mydb', 1, function(upgradeDb) {
+			switch (upgradeDb.oldVersion) {
+				case 0:
+					upgradeDb.createObjectStore('restaurants', {
+						keyPath: 'id'
+					});
+			}	
+			});
 
-	fetch(DBHelper.DATABASE_URL).then(function(response)  {
-		return response.json();
-	}).then(function(json) {
-		callback(null, json);
-	})
-	.catch(e => callback('Request failed', null));
+			// update idb with new data
+	  		dbPromise.then(function(db) {
+				var tx = db.transaction('restaurants', 'readwrite');
+				var keyValStore = tx.objectStore('restaurants');
+
+				restaurants.json().then(function(allRestaurants) {
+					allRestaurants.forEach(function (restaurant) {
+						keyValStore.put(restaurant);
+					})
+				});
+
+				return tx.complete;
+			}).then(function() {
+				console.log("Complete");
+			});
+
+			return response.json();
+		}).then(function(json) {
+			// Return fetch response to callback
+			callback(null, json);
+		})
+		.catch(function(e) {
+			// Catch if fetch request fails
+
+			dbPromise.then(function(db) {
+				var tx = db.transaction('restaurants', 'readwrite');
+				var keyValStore = tx.objectStore('restaurants');
+
+				return keyValStore.getAll();
+			}).then(function(restaurants) {
+				// Return idb response to callback
+				callback(null, restaurants);
+			}).catch(function() {
+				// idb response fails -> return error to callback
+				callback('Request failed', null);
+			});
+
+		});
 
 	}
+
 
   /**
    * Fetch a restaurant by its ID.
    */
-  static fetchRestaurantById(id, callback) {
-    // fetch all restaurants with proper error handling.
-    // DBHelper.fetchRestaurants((error, restaurants) => {
-    //   if (error) {
-    //     callback(error, null);
-    //   } else {
-    //     const restaurant = restaurants.find(r => r.id == id);
-    //     if (restaurant) { // Got the restaurant
-    //       callback(null, restaurant);
-    //     } else { // Restaurant does not exist in the database
-    //       callback('Restaurant does not exist', null);
-    //     }
-    //   }
-    // });
-
-   let baseURL = DBHelper.DATABASE_URL;
-   const idURL = baseURL + `/${id}`;
-   // const useURL = encodeURI(idURL);
-
-	fetch(idURL).then(function(response)  {
-		return response.json();
-	}).then(function(json) {
-		callback(null, json);
-	})
-	.catch(e => callback('Restaurant does not exist', null));    
-
-  }
+	static fetchRestaurantById(id, callback) {
+	    // fetch all restaurants with proper error handling.
+	    DBHelper.fetchRestaurants((error, restaurants) => {
+	      if (error) {
+	        callback(error, null);
+	      } else {
+	        const restaurant = restaurants.find(r => r.id == id);
+	        if (restaurant) { // Got the restaurant
+	          callback(null, restaurant);
+	        } else { // Restaurant does not exist in the database
+	          callback('Restaurant does not exist', null);
+	        }
+	      }
+	    });
+	}
 
   /**
    * Fetch restaurants by a cuisine type with proper error handling.

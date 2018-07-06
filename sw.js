@@ -5,7 +5,6 @@
 self.addEventListener('install', function(event) {
 	var urls = [
 		'/',
-   	'css/media.css',
    	'css/styles.css',
    	// 'data/restaurants.json',
    	'index.html',
@@ -51,11 +50,38 @@ self.addEventListener('fetch', function(event) {
   event.respondWith(
     caches.match(event.request).then(function(resp) {
       return resp || fetch(event.request).then(function(response) {
+      	// if not valid response or response not from our site
+
+      	if(!response || response.status !== 200 || response.type !== 'basic') {
+              return response;
+         }
+
+      	// if valid response
         return caches.open('v1').then(function(cache) {
+        	 console.log(response);
           cache.put(event.request, response.clone());
           return response;
         });  
+
       });
     })
   );
 });
+
+self.addEventListener('activate', function(event) {
+
+  var cacheWhitelist = ['v1'];
+
+  event.waitUntil(
+    caches.keys().then(function(cacheNames) {
+      return Promise.all(
+        cacheNames.map(function(cacheName) {
+          if (cacheWhitelist.indexOf(cacheName) === -1) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+});
+

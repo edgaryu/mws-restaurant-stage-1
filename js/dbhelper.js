@@ -64,19 +64,17 @@ class DBHelper {
 
 			// update idb with new data
 	  		dbPromise.then(function(db) {
-				var tx = db.transaction('restaurants', 'readwrite');
-				var keyValStore = tx.objectStore('restaurants');
+				
 
 				restaurants.json().then(function(allRestaurants) {
+					var tx = db.transaction('restaurants', 'readwrite');
+					var keyValStore = tx.objectStore('restaurants');
 					allRestaurants.forEach(function (restaurant) {
 						keyValStore.put(restaurant);
 					})
+					return tx.complete;
 				});
-
-				return tx.complete;
-			}).then(function() {
-				console.log("Complete");
-			});
+			})
 
 			return response.json();
 		}).then(function(json) {

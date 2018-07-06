@@ -320,4 +320,22 @@ nav h1 a {
   color: #666;
 }
 
+/* ====================== Media ====================== */
+
+@media screen and (max-width: 450px) {
+	/*index*/
+	nav {
+	  height: 90px;
+	}
+
+	nav h1 {
+	  padding: 15px 40px;
+	}
+
+	/*detail*/
+	.inside #map-container {
+		top: 130px;
+	}
+}
+
 

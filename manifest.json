@@ -1,0 +1,15 @@
+{
+  "short_name": "Rest. Rev.",
+  "name": "Restaurant Review",
+  "icons": [
+    {
+      "src":"site-icon.jpg",
+      "sizes": "512x512",
+      "type": "image/jpg"
+    }
+  ],
+  "start_url": "/?utm_source=homescreen",
+  "background_color": "#2B2B2B",
+  "theme_color": "#AF1818",
+  "display": "standalone"
+}

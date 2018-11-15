@@ -221,6 +221,47 @@ nav h1 a {
   text-transform: uppercase;
 }
 
+/* ====================== Favorite button  ====================== */
+
+/* Default button style when not toggled */
+button.fav {
+  background-color: #FFF;
+  border-bottom: 3px solid #eee;
+  /*color: #AF1818;*/
+  color: #484848;
+  display: inline-block;
+  font-size: 10pt;
+  margin: 15px 0 0;
+  padding: 8px 15px 10px;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  float: right;
+
+}
+/* Button style when button is toggled */
+button.fav[aria-pressed=true] {
+  background-color: #AF1818;
+  border-bottom: 3px solid #eee;
+  color: #FFF;
+  /*color: #484848;*/
+  display: inline-block;
+  font-size: 10pt;
+  margin: 15px 0 0;
+  padding: 8px 15px 10px;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  float: right;	
+
+}
+/* Accessible and easy to spot styles for our buttons when hovered and focused */
+button.fav:hover,
+button.fav:focus {
+	/*color: #AF1818;*/
+
+}
+
 /* ====================== Restaurant Details ====================== */
 .inside header {
   position: fixed;

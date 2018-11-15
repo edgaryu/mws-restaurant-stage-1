@@ -183,6 +183,10 @@ createRestaurantHTML = (restaurant) => {
 
   li.setAttribute('aria-label', `${restaurant.name}`);
 
+  // create favorite button 
+  const favButton = favoriteButton(restaurant);
+  li.append(favButton);
+
   return li
 }
 

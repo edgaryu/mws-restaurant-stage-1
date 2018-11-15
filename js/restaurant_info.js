@@ -82,6 +82,9 @@ fetchRestaurantFromURL = (callback) => {
  * Create restaurant HTML and add it to the webpage
  */
 fillRestaurantHTML = (restaurant = self.restaurant) => {
+  const favButtonContainer = document.getElementById('fav-button-container');
+  favButtonContainer.append( favoriteButton(restaurant) );
+
   const name = document.getElementById('restaurant-name');
   name.innerHTML = restaurant.name;
 

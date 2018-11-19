@@ -136,17 +136,23 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   title.innerHTML = 'Reviews';
   container.appendChild(title);
 
-  if (!reviews) {
+    if (!reviews) {
     const noReviews = document.createElement('p');
     noReviews.innerHTML = 'No reviews yet!';
     container.appendChild(noReviews);
-    return;
+  } else {
+    const ul = document.getElementById('reviews-list');
+    reviews.forEach(review => {
+      ul.appendChild(createReviewHTML(review));
+    });
+    container.appendChild(ul);
   }
-  const ul = document.getElementById('reviews-list');
-  reviews.forEach(review => {
-    ul.appendChild(createReviewHTML(review));
-  });
-  container.appendChild(ul);
+
+  const h3 = document.createElement('h3');
+  h3.innerHTML = "Leave a Review";
+  container.appendChild(h3);
+  const id = getParameterByName('id');
+  container.appendChild(reviewForm(id));
 }
 
 /**

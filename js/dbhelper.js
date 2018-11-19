@@ -23,7 +23,7 @@
 // });
 
 const dbPromise = {
-  db: idb.open('restaurant-reviews-db', 2, function(upgradeDb) {
+  db: idb.open('restaurantdb', 2, function(upgradeDb) {
 	 switch (upgradeDb.oldVersion) {
 		case 0:
 		  upgradeDb.createObjectStore('restaurants', { keyPath: 'id' });
@@ -142,20 +142,8 @@ class DBHelper {
 
 			var restaurants = response.clone();
 			
-
-			// var dbPromise = idb.open('mydb', 1, function(upgradeDb) {
-			// switch (upgradeDb.oldVersion) {
-			// 	case 0:
-			// 		upgradeDb.createObjectStore('restaurants', {
-			// 			keyPath: 'id'
-			// 		});
-			// }	
-			// });
-
 			// // update idb with new data
 	  // 		dbPromise.then(function(db) {
-				
-
 			// 	restaurants.json().then(function(allRestaurants) {
 			// 		var tx = db.transaction('restaurants', 'readwrite');
 			// 		var keyValStore = tx.objectStore('restaurants');
@@ -169,7 +157,6 @@ class DBHelper {
 			restaurants.json().then(function(allRestaurants) {
 				dbPromise.putRestaurants(allRestaurants);
 			})
-
 
 			return response.json();
 		}).then(function(json) {
@@ -248,7 +235,6 @@ class DBHelper {
 				if (idbReviews.length < 1) return null;
 				return idbReviews;
 			});
-			return null; // return null to handle error, as though there are no reviews.
 		});
   }
 

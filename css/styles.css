@@ -361,6 +361,35 @@ button.fav:focus {
   color: #666;
 }
 
+/* ====================== Review form ====================== */
+#review-form {
+	width: 100%;
+}
+
+#review-form input#name {
+	
+	min-width: 20em;
+	width: 50%;
+}
+
+
+#review-form textarea#comments {
+	min-width: 25em;
+	width: 50%;
+}
+
+#review-form button {
+  background-color: #AF1818;
+  color: #FFF;
+  display: inline-block;
+  font-size: 10pt;
+  margin: 0 0 0;
+  padding: 5px 10px 5px;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
 /* ====================== Media ====================== */
 
 @media screen and (max-width: 450px) {

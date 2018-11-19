@@ -1,5 +1,11 @@
+/* Adapted from MWS Restaurant Reviews walkthrough:
+   https://alexandroperez.github.io/mws-walkthrough/?3.3.favorite-restaurants-using-accessible-toggle-buttons
+*/
+
+
 function handleClick() {
   const restaurantId = this.dataset.id;
+  // check if this restaurant has been favorited by user
   const fav = this.getAttribute('aria-pressed') == 'true';
   const url = `${DBHelper.API_URL}/restaurants/${restaurantId}/?is_favorite=${!fav}`;
   const PUT = {method: 'PUT'};

@@ -37,9 +37,13 @@ const dbPromise = {
 	 }
   }),
 
+
+  /**
+	* Add event listeners so that the appropriate dbPromise functions are called when there is online functionality.
+	*/
   sendDataWhenOnline(offline_obj) {
   	if (offline_obj.reqtype === 'favorite') {
-  		const reqKeyName = 'favdata' + offline_obj.buttonId;
+  		const reqKeyName = 'favdata' + offline_obj.restaurantId;
 
   		localStorage.setItem(reqKeyName, JSON.stringify(offline_obj));
   		window.addEventListener('online', (event) => {
@@ -53,14 +57,33 @@ const dbPromise = {
   			}
   		})	
   	}
+  	else if (offline_obj.reqtype === 'review') {
+  		const reqKeyName = 'revdata' + offline_obj.timestamp;
+
+  		localStorage.setItem(reqKeyName, JSON.stringify(offline_obj));
+  		window.addEventListener('online', (event) => {
+  			let data = JSON.parse(localStorage.getItem(reqKeyName));
+  			if (data !== null) {
+  				if (offline_obj.reqtype === 'review') {
+  					dbPromise.addReview(offline_obj.review);
+  				}
+  				localStorage.removeItem(reqKeyName);
+  			}
+  		})	
+  	}
+  	else {
+  		console.log('Wrong req type');
+  	}
   	
 
   },
 
+  /**
+	* Change favorite status of a restaurant and save in idb. If offline, delay the request until online.
+	*/
   changeFavorite(restaurant_id, fav, button_id) {
 	 // Check if online. If offline, delay the req until online.
    if (!navigator.onLine) {
-   	console.log('offline');
    	const offline_fav_req = {
    		restaurantId : restaurant_id,
    		fav: fav,
@@ -89,8 +112,42 @@ const dbPromise = {
 	  });  		
   },
 
-  addReview() {
+  /**
+	* Add a review to a restaurant and save in idb. If offline, delay the request until online.
+	@params: `review` is a JSON object
+	*/
+  addReview(review) {
+	  // Check if online. If offline, delay the req until online.
+     if (!navigator.onLine) {
+   	 const offline_fav_req = {
+   	 	review: review,
+   	 	reqtype: 'review',
+   	 	timestamp: Date.now()
+   	 }
+		 dbPromise.sendDataWhenOnline(offline_fav_req);
+		 return;
+	  }  	
 
+	  const url = `${DBHelper.API_URL}/reviews/`;
+	  const POST = {
+	    method: 'POST',
+	    body: JSON.stringify(review)
+	  };
+
+	  // TODO: use Background Sync to sync data with API server
+	  return fetch(url, POST).then(response => {
+	    if (!response.ok) return Promise.reject("We couldn't post review to server.");
+	    return response.json();
+	  }).then(newNetworkReview => {
+	    // save new review on idb
+	    dbPromise.putReviews(newNetworkReview);
+	    // post new review on page
+	    const reviewList = document.getElementById('reviews-list');
+	    const review = createReviewHTML(newNetworkReview);
+	    reviewList.appendChild(review);
+	    // clear form
+	    clearForm();
+	  });
   },
 
   /**

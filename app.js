@@ -11,7 +11,14 @@ if ('serviceWorker' in navigator) {
   }).catch(function(error) {
     // registration failed
     console.log('Registration failed with ' + error);
-  });
+  })
+  // .then(function() {
+	 //  	navigator.serviceWorker.ready.then(function(swRegistration) {
+		//   return swRegistration.sync.register('myFirstSync');
+		// });
+  // });
+
+  
 }
 
 

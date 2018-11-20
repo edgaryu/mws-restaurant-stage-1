@@ -1,3 +1,7 @@
+/* Adapted from MWS Restaurant Reviews walkthrough:
+   https://alexandroperez.github.io/mws-walkthrough/?3.2.upgrading-idb-for-restaurant-reviews
+*/
+
 /**
  * Common database helper functions.
  */
@@ -33,6 +37,62 @@ const dbPromise = {
 	 }
   }),
 
+  sendDataWhenOnline(offline_obj) {
+  	if (offline_obj.reqtype === 'favorite') {
+  		const reqKeyName = 'favdata' + offline_obj.buttonId;
+
+  		localStorage.setItem(reqKeyName, JSON.stringify(offline_obj));
+  		window.addEventListener('online', (event) => {
+  			let data = JSON.parse(localStorage.getItem(reqKeyName));
+  			if (data !== null) {
+  				// console.log(data);
+  				if (offline_obj.reqtype === 'favorite') {
+  					dbPromise.changeFavorite(offline_obj.restaurantId, offline_obj.fav, offline_obj.buttonId);
+  				}
+  				localStorage.removeItem(reqKeyName);
+  			}
+  		})	
+  	}
+  	
+
+  },
+
+  changeFavorite(restaurant_id, fav, button_id) {
+	 // Check if online. If offline, delay the req until online.
+   if (!navigator.onLine) {
+   	console.log('offline');
+   	const offline_fav_req = {
+   		restaurantId : restaurant_id,
+   		fav: fav,
+   		buttonId: button_id,
+   		reqtype: 'favorite'
+   	}
+		dbPromise.sendDataWhenOnline(offline_fav_req);
+		return;
+	}
+
+	 // Put request to change favorite status for a restaurant
+	 const url = `${DBHelper.API_URL}/restaurants/${restaurant_id}/?is_favorite=${!fav}`;
+	 const PUT = {method: 'PUT'};
+
+	 return fetch(url, PUT).then(response => {
+	    if (!response.ok) return Promise.reject("We couldn't mark restaurant as favorite.");
+	    return response.json();
+	  }).then(updatedRestaurant => {
+	    // update restaurant on idb
+	    dbPromise.putRestaurants(updatedRestaurant, true);
+	    // change state of toggle button
+	    document.getElementById(button_id).setAttribute('aria-pressed', !fav);
+	  }).catch(error => {
+	  	// fetch request failed (probably due to lack of network connection)
+	  		return Promise.reject("We couldn't mark restaurant as favorite");
+	  });  		
+  },
+
+  addReview() {
+
+  },
+
   /**
 	* Save a restaurant or array of restaurants into idb, using promises. If second argument
 	* is passed a boolean true, data will be forcibly updated.
@@ -44,6 +104,8 @@ const dbPromise = {
 		const store = db.transaction('restaurants', 'readwrite').objectStore('restaurants');
 		Promise.all(restaurants.map(networkRestaurant => {
 		  return store.get(networkRestaurant.id).then(idbRestaurant => {
+		  	 //update updatedAt property for restaurant
+		  	 // networkRestaurant.updatedAt = new Date(networkRestaurant.updatedAt).toISOString;
 			 if (forceUpdate) return store.put(networkRestaurant);
 			 if (!idbRestaurant || new Date(networkRestaurant.updatedAt) > new Date(idbRestaurant.updatedAt)) {
 				return store.put(networkRestaurant);

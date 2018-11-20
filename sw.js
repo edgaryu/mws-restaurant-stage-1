@@ -59,7 +59,11 @@ self.addEventListener('fetch', function(event) {
 
       	// if valid response
         return caches.open('v1').then(function(cache) {
-        	 console.log(response);
+        	 // console.log(response);
+        	 // don't cache post requests
+        	 if (event.request.method === "POST") {
+        	 	return response;
+        	 }
           cache.put(event.request, response.clone());
           return response;
         });  
@@ -85,4 +89,12 @@ self.addEventListener('activate', function(event) {
     })
   );
 });
+
+
+// Waits until work is done, then may terminate service workers
+// self.addEventListener('sync', function(event) {
+//   if (event.tag == 'syncFavorite') {
+//     event.waitUntil(doSomeStuff());
+//   }
+// });
 

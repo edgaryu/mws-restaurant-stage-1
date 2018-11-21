@@ -476,7 +476,7 @@ class DBHelper {
 		const largeImgUrl = (`/images/${srcBaseName}-800w.jpg`);
 
 		img.src = largeImgUrl;
-		img.alt = `Image of ${restaurant.name}`;
+		// img.alt = `Image of ${restaurant.name}`;
 		img.sizes = '(max-width: 450px) 50vw, 50vw';
 		img.srcset = (`${smallImgUrl} 400w, ${largeImgUrl} 800w`);
 

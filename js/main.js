@@ -152,17 +152,47 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
   addMarkersToMap();
 }
 
+
+
 /**
  * Create restaurant HTML.
  */
 createRestaurantHTML = (restaurant) => {
   const li = document.createElement('li');
 
+  // Implement lazy loading
   const image = document.createElement('img');
-  DBHelper.imageUrlForRestaurant(restaurant, image);
-  // image.className = 'restaurant-img';
-  // image.src = DBHelper.imageUrlForRestaurant(restaurant);
-  	li.append(image);
+  image.alt = `Image of ${restaurant.name}`;
+  const config = {
+  	threshold: 0.1
+  };
+
+  let observer;
+  if ('IntersectionObserver' in window) {
+  	observer = new IntersectionObserver(onChange, config);
+  	observer.observe(image);
+  } else {
+  	console.log('Intersection Observer not supported');
+  	loadImage(image);
+  }
+
+  const loadImage = image => {
+	DBHelper.imageUrlForRestaurant(restaurant, image);
+  }
+
+  function onChange(changes, observer) {
+  	changes.forEach(change => {
+  		if (change.intersectionRatio > 0) {
+  			// Stop watching and load the image
+  			loadImage(change.target);
+  			observer.unobserve(change.target);
+  		}
+  	})
+  }
+
+
+  // DBHelper.imageUrlForRestaurant(restaurant, image);
+  li.append(image);
 
   const name = document.createElement('h1');
   name.innerHTML = restaurant.name;

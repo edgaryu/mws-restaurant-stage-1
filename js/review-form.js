@@ -88,7 +88,7 @@ function handleSubmit(e) {
   const review = validateAndGetData();
   if (!review) return;
 
-  console.log(review);
+  // console.log(review);
 
   dbPromise.addReview(review);
 

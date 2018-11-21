@@ -1,3 +1,7 @@
+/* Intersection Observer code Adapted from Live Webinar MWS Stage 3 by Eliza & Lorenzo
+	https://docs.google.com/presentation/d/1i_b30OvHtmKXWI5oUknDIto5S2YnfJC619mYYq1QpJ4/edit#slide=id.g3a8066f5a6_0_134
+*/
+
 let restaurants,
   neighborhoods,
   cuisines
@@ -176,10 +180,12 @@ createRestaurantHTML = (restaurant) => {
   	loadImage(image);
   }
 
+  // load image naturally from dbhelper
   const loadImage = image => {
 	DBHelper.imageUrlForRestaurant(restaurant, image);
   }
 
+  // load image when intersection observer reaches the image
   function onChange(changes, observer) {
   	changes.forEach(change => {
   		if (change.intersectionRatio > 0) {
@@ -189,7 +195,6 @@ createRestaurantHTML = (restaurant) => {
   		}
   	})
   }
-
 
   // DBHelper.imageUrlForRestaurant(restaurant, image);
   li.append(image);

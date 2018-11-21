@@ -2,7 +2,6 @@
    https://alexandroperez.github.io/mws-walkthrough/?3.4.adding-a-form-for-new-reviews
 */
 
-
 /**
  * Returns a li element with review data so it can be appended to 
  * the review list.
@@ -88,30 +87,7 @@ function handleSubmit(e) {
   const review = validateAndGetData();
   if (!review) return;
 
-  // console.log(review);
-
   dbPromise.addReview(review);
-
-  // const url = `${DBHelper.API_URL}/reviews/`;
-  // const POST = {
-  //   method: 'POST',
-  //   body: JSON.stringify(review)
-  // };
-
-  // // TODO: use Background Sync to sync data with API server
-  // return fetch(url, POST).then(response => {
-  //   if (!response.ok) return Promise.reject("We couldn't post review to server.");
-  //   return response.json();
-  // }).then(newNetworkReview => {
-  //   // save new review on idb
-  //   dbPromise.putReviews(newNetworkReview);
-  //   // post new review on page
-  //   const reviewList = document.getElementById('reviews-list');
-  //   const review = createReviewHTML(newNetworkReview);
-  //   reviewList.appendChild(review);
-  //   // clear form
-  //   clearForm();
-  // });
 
 }
 

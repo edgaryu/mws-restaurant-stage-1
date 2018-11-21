@@ -2,30 +2,6 @@
    https://alexandroperez.github.io/mws-walkthrough/?3.2.upgrading-idb-for-restaurant-reviews
 */
 
-/**
- * Common database helper functions.
- */
-// var db;
-// var request = indexedDB.open("restaurants");
-// request.onerror = function(evt) {
-//   console.log("Database error code: " + evt.target.errorCode);
-// };
-// request.onsuccess = function(evt) {
-//   db = request.result;
-
-// };
-
-// const dbPromise = idb.open('keyval-store', 1, upgradeDB => {
-//   upgradeDB.createObjectStore('keyval');
-// });
-// dbPromise.then(function(db) {
-// 	var tx = db.transaction('keyval');
-// 	var keyValStore = tx.objectStore('keyval');
-// 	return keyValStore.get('hello');
-// }).then(function(val) {
-// 	console.log('The value of "hello" is:', val);
-// });
-
 const dbPromise = {
   db: idb.open('restaurantdb', 2, function(upgradeDb) {
 	 switch (upgradeDb.oldVersion) {
@@ -42,14 +18,16 @@ const dbPromise = {
 	* Add event listeners so that the appropriate dbPromise functions are called when there is online functionality.
 	*/
   sendDataWhenOnline(offline_obj) {
+  	// For changing the favorite status of a restaurant
   	if (offline_obj.reqtype === 'favorite') {
   		const reqKeyName = 'favdata' + offline_obj.restaurantId;
 
   		localStorage.setItem(reqKeyName, JSON.stringify(offline_obj));
+
+  		// When network is online again, perform request and remove from localStorage
   		window.addEventListener('online', (event) => {
   			let data = JSON.parse(localStorage.getItem(reqKeyName));
   			if (data !== null) {
-  				// console.log(data);
   				if (offline_obj.reqtype === 'favorite') {
   					dbPromise.changeFavorite(offline_obj.restaurantId, offline_obj.fav, offline_obj.buttonId);
   				}
@@ -57,10 +35,13 @@ const dbPromise = {
   			}
   		})	
   	}
+  	// For adding reviews to a restaurant
   	else if (offline_obj.reqtype === 'review') {
   		const reqKeyName = 'revdata' + offline_obj.timestamp;
 
   		localStorage.setItem(reqKeyName, JSON.stringify(offline_obj));
+
+  		// When network is online again, perform request and remove from localStorage
   		window.addEventListener('online', (event) => {
   			let data = JSON.parse(localStorage.getItem(reqKeyName));
   			if (data !== null) {
@@ -72,7 +53,7 @@ const dbPromise = {
   		})	
   	}
   	else {
-  		console.log('Wrong req type');
+  		console.log('Wrong request type');
   	}
   	
 
@@ -161,8 +142,6 @@ const dbPromise = {
 		const store = db.transaction('restaurants', 'readwrite').objectStore('restaurants');
 		Promise.all(restaurants.map(networkRestaurant => {
 		  return store.get(networkRestaurant.id).then(idbRestaurant => {
-		  	 //update updatedAt property for restaurant
-		  	 // networkRestaurant.updatedAt = new Date(networkRestaurant.updatedAt).toISOString;
 			 if (forceUpdate) return store.put(networkRestaurant);
 			 if (!idbRestaurant || new Date(networkRestaurant.updatedAt) > new Date(idbRestaurant.updatedAt)) {
 				return store.put(networkRestaurant);
@@ -235,9 +214,6 @@ class DBHelper {
   }
 
   static get API_URL() {
-	 // const port = 8000 // Change this to your server port
-	 // return `http://localhost:${port}/data/restaurants.json`;
-
 	 const port = 1337;
 	 return `http://localhost:${port}`;
   }
@@ -262,17 +238,6 @@ class DBHelper {
 			var restaurants = response.clone();
 			
 			// // update idb with new data
-	  // 		dbPromise.then(function(db) {
-			// 	restaurants.json().then(function(allRestaurants) {
-			// 		var tx = db.transaction('restaurants', 'readwrite');
-			// 		var keyValStore = tx.objectStore('restaurants');
-			// 		allRestaurants.forEach(function (restaurant) {
-			// 			keyValStore.put(restaurant);
-			// 		})
-			// 		return tx.complete;
-			// 	});
-			// })
-
 			restaurants.json().then(function(allRestaurants) {
 				dbPromise.putRestaurants(allRestaurants);
 			})
@@ -293,20 +258,6 @@ class DBHelper {
 				callback('No restaurants found in idb', null);
 			 }
 			});
-
-			// dbPromise.then(function(db) {
-			// 	var tx = db.transaction('restaurants', 'readwrite');
-			// 	var keyValStore = tx.objectStore('restaurants');
-
-			// 	return keyValStore.getAll();
-			// }).then(function(restaurants) {
-			// 	// Return idb response to callback
-			// 	callback(null, restaurants);
-			// }).catch(function() {
-			// 	// idb response fails -> return error to callback
-			// 	callback('Request failed', null);
-			// });
-
 		});
 
 	}
@@ -336,13 +287,11 @@ class DBHelper {
 	*/
 	static fetchReviewsByRestaurantId(restaurant_id) {
 		return fetch(`${DBHelper.API_URL}/reviews/?restaurant_id=${restaurant_id}`).then(response => {
-			// console.log(response);
 			if (!response.ok) return Promise.reject("Reviews couldn't be fetched from network");
 			return response.json();
 		}).then(fetchedReviews => {
 			// if reviews could be fetched from network:
 			// store reviews on idb
-			// console.log(fetchedReviews);
 			dbPromise.putReviews(fetchedReviews);
 			return fetchedReviews;
 		}).catch(networkError => {
